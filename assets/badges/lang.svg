@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="101" height="20" role="img" aria-label="lang: EN | PT-BR">
+  <title>lang: EN | PT-BR</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="101" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="34" height="20" fill="#232F3E"/>
+    <rect x="34" width="67" height="20" fill="#B5583A"/>
+    <rect width="101" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="110" text-rendering="geometricPrecision" transform="scale(.1)">
+    <text x="170" y="150" fill="#010101" fill-opacity=".3">lang</text>
+    <text x="170" y="140">lang</text>
+    <text x="675.0" y="150" fill="#010101" fill-opacity=".3">EN | PT-BR</text>
+    <text x="675.0" y="140">EN | PT-BR</text>
+  </g>
+</svg>

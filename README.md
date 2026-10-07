@@ -1,104 +1,135 @@
 <div align="center">
 
-<img src="assets/logo.svg" alt="" width="150">
+**English** · [Português](README.pt-BR.md)
+
+<br>
+
+<img src="assets/logo.svg" alt="" width="180">
 
 <br>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/wordmark-light.svg">
-  <img src="assets/wordmark-light.svg" alt="AWS SECURITY AGENT para Claude Code" width="420">
+  <img src="assets/wordmark-light.svg" alt="AWS SECURITY AGENT for Claude Code" width="420">
 </picture>
 
-**Scan, threat model, pentest e remediação, direto da conversa.**
+**Scans, threat models, pentests and remediation, right from the conversation.**
 
-O power do AWS Security Agent para Kiro, reescrito como plugin do Claude Code.
-Um MCP server, duas skills e um hook, com os findings fora do git desde o primeiro byte.
+The AWS Security Agent power for Kiro, rebuilt as a Claude Code plugin.
+One MCP server, two skills and a hook, with findings kept out of git from the first byte.
 
 <a href="plugins/aws-security-agent/.claude-plugin/plugin.json"><img src="assets/badges/release.svg" alt="release: v0.1.0"></a>
-<a href="plugins/aws-security-agent/LICENSE"><img src="assets/badges/license.svg" alt="license: Apache-2.0"></a>
+<a href="LICENSE"><img src="assets/badges/license.svg" alt="license: Apache-2.0"></a>
+<a href="https://github.com/renatofigueiredods/aws-security-agent-claude/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/renatofigueiredods/aws-security-agent-claude/ci.yml?branch=main&label=build&labelColor=232F3E" alt="build"></a>
+<a href="https://github.com/renatofigueiredods/aws-security-agent-claude/stargazers"><img src="https://img.shields.io/github/stars/renatofigueiredods/aws-security-agent-claude?label=stars&labelColor=232F3E&color=C42D44" alt="stars"></a>
 <a href="plugins/aws-security-agent/.mcp.json"><img src="assets/badges/mcp.svg" alt="mcp server: 0.2.1"></a>
-<a href="https://github.com/AWS-Security-Agent/aws-security-agent-kiro-power/tree/f4c1d88"><img src="assets/badges/base.svg" alt="base: Kiro power f4c1d88"></a>
 <br>
-<img src="assets/badges/service.svg" alt="serviço: AWS Security Agent">
-<img src="assets/badges/tools.svg" alt="ferramentas MCP: 11">
+<img src="assets/badges/service.svg" alt="service: AWS Security Agent">
+<img src="assets/badges/tools.svg" alt="MCP tools: 11">
 <img src="assets/badges/skills.svg" alt="skills: 2">
 <img src="assets/badges/hook.svg" alt="hook: Stop">
 <img src="assets/badges/agent.svg" alt="agent: Claude Code">
+<img src="assets/badges/lang.svg" alt="lang: EN | PT-BR">
 
 <br>
 
-[**Instalação**](#instalação) · [**Como funciona**](#como-funciona) · [**Uso**](#uso) · [**Convenções**](#convenções-essenciais) · [**Licença**](#licença)
+[**Install**](#install) · [**How it works**](#how-it-works) · [**Usage**](#usage) · [**Identity**](#visual-identity) · [**Contributing**](CONTRIBUTING.md)
+
+<br>
+
+<details>
+<summary><b>&nbsp;Switch to identity option 2&nbsp;</b></summary>
+
+<br>
+
+<img src="assets/logo-lockup.svg" alt="AWS Security Agent + Claude Code, side by side" width="340">
+
+<br><br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/wordmark-light.svg">
+  <img src="assets/wordmark-light.svg" alt="AWS SECURITY AGENT for Claude Code" width="420">
+</picture>
+
+<br><br>
+
+<img src="assets/palette.svg" alt="Palette, Security Agent #DD344C, Badge Red #C42D44, Squid Ink #232F3E, Claude Clay #D97757, Badge Clay #B5583A, Paper #F2F4F7" width="880">
+
+</details>
+
+<sub>Option 1 above is the one in use. Option 2 places both marks side by side.</sub>
 
 </div>
 
 <br>
 
 > [!NOTE]
-> **Este plugin é uma adaptação do [aws-security-agent-kiro-power](https://github.com/AWS-Security-Agent/aws-security-agent-kiro-power)**
-> no commit `f4c1d88`. As instruções foram traduzidas para português e reescritas para os
-> mecanismos do Claude Code (skills, Stop hook, plan mode). O MCP server é o mesmo pacote
-> oficial `awslabs.security-agent-mcp-server`, fixado na versão `0.2.1`.
+> **This plugin adapts [aws-security-agent-kiro-power](https://github.com/AWS-Security-Agent/aws-security-agent-kiro-power)**
+> at commit `f4c1d88`. The instructions were rewritten for Claude Code mechanics (skills,
+> Stop hook, plan mode) in English and Brazilian Portuguese. The MCP server is the same
+> official package, `awslabs.security-agent-mcp-server`, pinned to `0.2.1`.
 
 > [!IMPORTANT]
-> Cada scan e cada pentest gera cobrança na sua conta AWS. Consulte o
-> [pricing do AWS Security Agent](https://aws.amazon.com/security-agent/pricing/). O plugin
-> só inicia um job quando você pede ou confirma.
+> Every scan and pentest is billed to your AWS account. See
+> [AWS Security Agent pricing](https://aws.amazon.com/security-agent/pricing/). The plugin
+> starts a job only when you ask for it or confirm it.
 
 <br>
 
 ---
 
-## Por que um plugin
+## Why a plugin
 
-O power do Kiro junta quatro coisas num pacote só. O Claude Code tem um equivalente nativo
-para cada uma, e o plugin é o formato que instala as quatro juntas.
+The Kiro power bundles four pieces. Claude Code has a native equivalent for each, and a
+plugin is the format that installs all four together.
 
-| No power do Kiro | No plugin do Claude Code | O que faz |
+| In the Kiro power | In the Claude Code plugin | What it does |
 | --- | --- | --- |
-| `mcp.json` | [`.mcp.json`](plugins/aws-security-agent/.mcp.json) | Sobe o MCP `security-agent` via `uvx` |
-| `POWER.md` | skill [`aws-security-agent`](plugins/aws-security-agent/skills/aws-security-agent/SKILL.md) | Setup, scan completo, diff scan, threat model, pentest e apresentação dos findings |
-| `steering/security-agent-remediation.md` | skill [`security-agent-remediation`](plugins/aws-security-agent/skills/security-agent-remediation/SKILL.md) | Exporta, tria e conduz a correção dos findings |
-| hook `.kiro.hook` criado no setup | [`hooks.json`](plugins/aws-security-agent/hooks/hooks.json) e [`diff-scan-suggester.sh`](plugins/aws-security-agent/hooks/diff-scan-suggester.sh) | Sugere diff scan quando uma mudança de código termina |
+| `mcp.json` | [`.mcp.json`](plugins/aws-security-agent/.mcp.json) | Starts the `security-agent` MCP through `uvx` |
+| `POWER.md` | skill [`aws-security-agent`](plugins/aws-security-agent/skills/aws-security-agent/SKILL.md) | Setup, full scan, diff scan, threat model, pentest and findings presentation |
+| `steering/security-agent-remediation.md` | skill [`security-agent-remediation`](plugins/aws-security-agent/skills/security-agent-remediation/SKILL.md) | Exports, triages and drives the fix of findings |
+| `.kiro.hook` created at setup | [`hooks.json`](plugins/aws-security-agent/hooks/hooks.json) and [`diff-scan-suggester.sh`](plugins/aws-security-agent/hooks/diff-scan-suggester.sh) | Suggests a diff scan when a code change is finished |
 
-Na tradução, quatro comportamentos mudaram de propósito.
+Four behaviors changed on purpose in the rewrite.
 
-| Comportamento | Kiro | Claude Code | Motivo |
+| Behavior | Kiro | Claude Code | Reason |
 | --- | --- | --- | --- |
-| Versão do MCP | `@latest` | `@0.2.1` | Uma versão nova roda com a sua credencial AWS, então a atualização passa por revisão |
-| Hook de diff scan | Avaliado em todo turno, roda o scan sem perguntar | Só acorda o agente com código novo em projeto ativado, e sugere o scan | Cada scan é cobrado, e um turno extra em todo repo custa contexto |
-| Correção de findings | Spec session do Kiro | Plano de correção em plan mode | Mecanismo equivalente do Claude Code |
-| Espera entre consultas | `sleep` em primeiro plano | `sleep` em background | O Claude Code bloqueia `sleep` longo em primeiro plano |
+| MCP version | `@latest` | `@0.2.1` | A new release runs with your AWS credentials, so upgrades go through review |
+| Diff scan hook | Evaluated every turn, runs the scan without asking | Wakes the agent only on new code in an enabled project, and suggests the scan | Every scan is billed, and an extra turn in every repo costs context |
+| Fixing findings | Kiro spec session | Fix plan in plan mode | Claude Code's equivalent mechanism |
+| Waiting between checks | Foreground `sleep` | Background `sleep` | Claude Code blocks long foreground `sleep` |
 
 <br>
 
 ---
 
-## Como funciona
+## How it works
 
 ```mermaid
 flowchart LR
-    subgraph pedido["Pedido na conversa"]
-        A["Scan completo<br/>ou diff scan"]
-        B["Threat model<br/>de design.md"]
-        C["Pentest de<br/>app publicada"]
-        D["Corrigir<br/>findings"]
+    subgraph ask["Request in the conversation"]
+        A["Full scan<br/>or diff scan"]
+        B["Threat model<br/>of design.md"]
+        C["Pentest of a<br/>deployed app"]
+        D["Fix<br/>findings"]
     end
 
     SK1{{"skill<br/>aws-security-agent"}}
     SK2{{"skill<br/>security-agent-remediation"}}
     MCP["MCP security-agent<br/><i>uvx awslabs.security-agent-mcp-server@0.2.1</i>"]
 
-    subgraph aws["AWS Security Agent · região das credenciais"]
+    subgraph aws["AWS Security Agent · Region of your credentials"]
         AS[("Agent Space")]
         J1["Code review job"]
         J2["Threat model job"]
         J3["Pentest job"]
     end
 
-    subgraph repo["Seu repositório"]
-        F[(".security-agent/<br/>gitignore com *")]
-        P["Plano de correção<br/>em plan mode"]
+    subgraph repo["Your repository"]
+        F[(".security-agent/<br/>gitignore with *")]
+        P["Fix plan<br/>in plan mode"]
     end
 
     H(["Stop hook<br/>diff-scan-suggester.sh"])
@@ -116,13 +147,13 @@ flowchart LR
     SK1 ==> F
     SK2 ==> F
     F ==> P
-    P -. "diff scan de verificação" .-> SK1
-    H -. "código novo no turno" .-> SK1
+    P -. "verification diff scan" .-> SK1
+    H -. "new code this turn" .-> SK1
 
     classDef src fill:#232F3E,stroke:#5A6B82,stroke-width:1px,color:#F2F4F7
-    classDef core fill:#B8461B,stroke:#FF9900,stroke-width:2px,color:#FFFFFF
-    classDef mcp fill:#2F6690,stroke:#7FB3D5,stroke-width:1px,color:#FFFFFF
-    classDef store fill:#1B2738,stroke:#FF9900,stroke-width:1px,color:#F2F4F7
+    classDef core fill:#C42D44,stroke:#DD344C,stroke-width:2px,color:#FFFFFF
+    classDef mcp fill:#B5583A,stroke:#D97757,stroke-width:1px,color:#FFFFFF
+    classDef store fill:#1B2738,stroke:#DD344C,stroke-width:1px,color:#F2F4F7
     classDef out fill:#3A4A5E,stroke:#9AA8BA,stroke-width:1px,color:#F2F4F7
     class A,B,C,D src
     class SK1,SK2 core
@@ -131,39 +162,39 @@ flowchart LR
     class P,H out
 ```
 
-Da esquerda para a direita, o pedido em linguagem natural ativa uma das duas skills, a
-skill chama o MCP, e o MCP envia código e documentos para o AWS Security Agent na conta e
-região das suas credenciais. O job roda na AWS e a skill acompanha até o fim. Os findings
-voltam como resumo no chat e como relatório completo em `.security-agent/`, que recebe um
-`.gitignore` com `*` antes de qualquer escrita, porque finding traz script de ataque e
-passos de reprodução.
+From left to right, a natural-language request activates one of the two skills, the skill
+calls the MCP, and the MCP sends code and documents to AWS Security Agent in the account
+and Region of your credentials. The job runs in AWS and the skill follows it to the end.
+Findings come back as a chat summary and as a full report in `.security-agent/`, which
+gets a `.gitignore` with `*` before anything is written, because findings carry attack
+scripts and reproduction steps.
 
-O plugin tem três peças.
+The plugin has three pieces.
 
-1. **O MCP server.** O pacote oficial `awslabs.security-agent-mcp-server` expõe 11
-   ferramentas (`setup_check`, `setup`, `start_security_scan`, `start_diff_scan`,
+1. **The MCP server.** The official `awslabs.security-agent-mcp-server` package exposes 11
+   tools (`setup_check`, `setup`, `start_security_scan`, `start_diff_scan`,
    `start_threat_model_review`, `get_scan_status`, `get_scan_findings`, `list_scans`,
-   `stop_scan`, `call_api`, `get_api_guide`). Ele guarda estado local em
-   `~/.securityagent/`.
-2. **As skills.** `aws-security-agent` roteia o pedido para o workflow certo e acompanha
-   o job com intervalo de 300 s (scan completo e threat model), 120 s (diff scan) ou
-   900 s (pentest). `security-agent-remediation` exporta os findings, ordena por risk
-   level, risk score e confiança, e abre um plano de correção por finding.
-3. **O hook.** Ao fim de cada turno, verifica se o projeto tem `.security-agent/diff-hook`
-   e arquivos de código alterados desde a última avaliação. Só nesse caso devolve o turno
-   ao agente para decidir se a mudança é sensível e está concluída.
+   `stop_scan`, `call_api`, `get_api_guide`). It keeps local state in `~/.securityagent/`.
+2. **The skills.** `aws-security-agent` routes the request to the right workflow and
+   follows the job every 300 s (full scan and threat model), 120 s (diff scan) or 900 s
+   (pentest). `security-agent-remediation` exports findings, sorts them by risk level,
+   risk score and confidence, and opens one fix plan per finding.
+3. **The hook.** At the end of each turn it checks whether the project has
+   `.security-agent/diff-hook` and code files changed since the last evaluation. Only then
+   does it hand the turn back so the agent can decide whether the change is sensitive and
+   finished.
 
 > [!TIP]
-> Sem `WORKSPACE_ROOT`, o MCP só aceita escanear o diretório onde o Claude Code foi aberto
-> e seus subdiretórios. Isso impede que um caminho como `~/.aws` seja compactado e enviado
-> por engano. Para liberar outro diretório, exporte `SECURITY_AGENT_WORKSPACE_ROOT` antes
-> de abrir o Claude Code.
+> Without `WORKSPACE_ROOT`, the MCP only scans the directory where Claude Code was opened
+> and its subdirectories. That keeps a path like `~/.aws` from being zipped and uploaded by
+> mistake. To allow another directory, export `SECURITY_AGENT_WORKSPACE_ROOT` before
+> opening Claude Code.
 
 <br>
 
 ---
 
-## Instalação
+## Install
 
 <div align="center">
 
@@ -171,30 +202,38 @@ O plugin tem três peças.
 <img src="assets/badges/os-macos.svg" alt="os: macOS">
 <img src="assets/badges/os-windows.svg" alt="os: Windows">
 <br>
-<img src="assets/badges/service.svg" alt="serviço: AWS Security Agent">
-<img src="assets/badges/region.svg" alt="região padrão: us-east-1">
-<img src="assets/badges/tested-linux.svg" alt="hook testado: Linux 6/6">
+<img src="assets/badges/service.svg" alt="service: AWS Security Agent">
+<img src="assets/badges/region.svg" alt="default region: us-east-1">
+<img src="assets/badges/tested-linux.svg" alt="hook tested: Linux 6/6">
 
 </div>
 
-O plugin é instalado pelo próprio Claude Code a partir deste repositório. O que muda por
-sistema são as dependências do MCP (`uv`) e do hook (`bash`, `git`, `jq`).
+Claude Code installs the plugin straight from this repository. The marketplace ships the
+same plugin in two languages, so pick one.
+
+| Language | Plugin | Install command |
+| --- | --- | --- |
+| **English** (default) | `aws-security-agent` | `/plugin install aws-security-agent@aws-security-agent-claude` |
+| **Português** | `aws-security-agent-pt-br` | `/plugin install aws-security-agent-pt-br@aws-security-agent-claude` |
+
+Both bring the same MCP server and hook, so install only one. What changes per operating
+system are the dependencies of the MCP (`uv`) and of the hook (`bash`, `git`, `jq`).
 
 | | Linux | macOS | Windows |
 | --- | --- | --- | --- |
-| `uv` | instalador oficial | `brew install uv` | instalador oficial |
-| Shell do hook | bash | bash | Git Bash |
-| Hash do diff | `sha256sum` | `shasum -a 256` | `sha256sum` do Git Bash |
-| Status | testado | não testado | não testado |
+| `uv` | official installer | `brew install uv` | official installer |
+| Hook shell | bash | bash | Git Bash |
+| Diff hash | `sha256sum` | `shasum -a 256` | Git Bash `sha256sum` |
+| Status | tested | not tested | not tested |
 
-### Escolha o seu sistema
+### Pick your system
 
 <details>
 <summary>&nbsp;<img src="assets/badges/os-linux.svg" alt="os: Linux" align="top"></summary>
 
 <br>
 
-**1. Instale as dependências**
+**1. Install the dependencies**
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -202,35 +241,35 @@ sudo apt install jq git        # Debian, Ubuntu
 sudo dnf install jq git        # Fedora, RHEL
 ```
 
-**2. Autentique na AWS**
+**2. Sign in to AWS**
 
-As credenciais vêm do ambiente em que o Claude Code é aberto.
+Credentials come from the environment Claude Code is opened in.
 
 ```bash
-aws sso login --profile <seu-profile>
-export AWS_PROFILE=<seu-profile>
-export AWS_REGION=us-east-1    # opcional, este é o padrão
+aws sso login --profile <your-profile>
+export AWS_PROFILE=<your-profile>
+export AWS_REGION=us-east-1    # optional, this is the default
 ```
 
-**3. Instale o plugin**
+**3. Install the plugin**
 
-Dentro do Claude Code.
+Inside Claude Code.
 
 ```
 /plugin marketplace add renatofigueiredods/aws-security-agent-claude
 /plugin install aws-security-agent@aws-security-agent-claude
 ```
 
-Reinicie a sessão para o MCP `security-agent` subir.
+Restart the session so the `security-agent` MCP starts.
 
-**4. Confira**
+**4. Check**
 
 ```
 /mcp
 ```
 
-O servidor `security-agent` aparece conectado. Depois peça o setup na conversa, por
-exemplo *"faz o setup do security agent"*.
+The `security-agent` server shows as connected. Then ask for setup in the conversation,
+for example *"set up the security agent"*.
 
 </details>
 
@@ -239,35 +278,35 @@ exemplo *"faz o setup do security agent"*.
 
 <br>
 
-**1. Instale as dependências**
+**1. Install the dependencies**
 
 ```bash
 brew install uv jq git
 ```
 
-**2. Autentique na AWS**
+**2. Sign in to AWS**
 
 ```bash
-aws sso login --profile <seu-profile>
-export AWS_PROFILE=<seu-profile>
+aws sso login --profile <your-profile>
+export AWS_PROFILE=<your-profile>
 ```
 
-**3. Instale o plugin**
+**3. Install the plugin**
 
 ```
 /plugin marketplace add renatofigueiredods/aws-security-agent-claude
 /plugin install aws-security-agent@aws-security-agent-claude
 ```
 
-**4. Confira**
+**4. Check**
 
 ```
 /mcp
 ```
 
 > [!NOTE]
-> O macOS não traz `sha256sum`, e o hook usa `shasum -a 256` nesse caso. Ainda não foi
-> validado em macOS.
+> macOS does not ship `sha256sum`, so the hook falls back to `shasum -a 256`. Not yet
+> validated on macOS.
 
 </details>
 
@@ -276,7 +315,7 @@ export AWS_PROFILE=<seu-profile>
 
 <br>
 
-**1. Instale as dependências**
+**1. Install the dependencies**
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
@@ -284,72 +323,107 @@ winget install Git.Git
 winget install jqlang.jq
 ```
 
-**2. Autentique na AWS**
+**2. Sign in to AWS**
 
 ```powershell
-aws sso login --profile <seu-profile>
-$env:AWS_PROFILE = "<seu-profile>"
+aws sso login --profile <your-profile>
+$env:AWS_PROFILE = "<your-profile>"
 ```
 
-**3. Instale o plugin**
+**3. Install the plugin**
 
 ```
 /plugin marketplace add renatofigueiredods/aws-security-agent-claude
 /plugin install aws-security-agent@aws-security-agent-claude
 ```
 
-**4. Confira**
+**4. Check**
 
 ```
 /mcp
 ```
 
 > [!NOTE]
-> O hook é um script bash e depende do Git Bash. Ainda não foi validado em Windows.
+> The hook is a bash script and relies on Git Bash. Not yet validated on Windows.
 
 </details>
 
 > [!IMPORTANT]
-> O `.gitignore` com `*` dentro de `.security-agent/` impede que os findings entrem no
-> repositório. Confirme também que o `.gitignore` da raiz não força a inclusão desse
-> diretório, porque o relatório contém script de ataque funcional e às vezes segredo vazado.
+> The `.gitignore` with `*` inside `.security-agent/` keeps findings out of the repository.
+> Also make sure the root `.gitignore` does not force that directory back in, because the
+> report contains working attack scripts and sometimes leaked secrets.
 
 <br>
 
 ---
 
-## Uso
+## Usage
 
-Você conversa, a skill escolhe o workflow.
+You talk, the skill picks the workflow.
 
 ```
-> faz o setup do security agent
-> roda um diff scan das minhas mudanças antes do PR
-> faz um scan completo do repositório
-> roda o threat model no requirements.md e no design.md
-> faz um pentest na aplicação de homologação
-> como está o scan?
-> traz os findings do último pentest e me ajuda a corrigir
+> set up the security agent
+> run a diff scan on my changes before the PR
+> run a full scan of the repository
+> run the threat model on requirements.md and design.md
+> pentest the staging application
+> how is the scan going?
+> pull the findings from the last pentest and help me fix them
 ```
 
-Para desligar a sugestão automática de diff scan num projeto, apague
+To turn off the automatic diff scan suggestion in a project, delete
 `.security-agent/diff-hook`.
 
 <br>
 
 ---
 
-## Convenções essenciais
+## Popularity
 
-| Regra | Por quê |
+<div align="center">
+
+<a href="https://star-history.com/#renatofigueiredods/aws-security-agent-claude&Date">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=renatofigueiredods/aws-security-agent-claude&type=Date&theme=dark">
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=renatofigueiredods/aws-security-agent-claude&type=Date">
+  <img src="https://api.star-history.com/svg?repos=renatofigueiredods/aws-security-agent-claude&type=Date" alt="Star history of aws-security-agent-claude" width="820">
+</picture>
+</a>
+
+</div>
+
+<br>
+
+---
+
+## Core conventions
+
+| Rule | Why |
 | --- | --- |
-| Findings só em `.security-agent/`, com `.gitignore` criado antes | Finding traz script de ataque, passos de reprodução e às vezes segredo |
-| No chat, só título, contagem e uma linha de impacto | O detalhe de exploração fica no arquivo, fora do histórico da conversa |
-| Job só começa com pedido ou confirmação | Cada scan e pentest é cobrado na conta AWS |
-| Confiança `HIGH` e `MEDIUM` por padrão | As faixas abaixo trazem mais ruído, e ampliar fica a pedido |
-| Ordem de triagem por risk level, risk score e confiança | Ordenação determinística, sem depender de leitura a olho |
-| Um plano de correção por finding ou por causa raiz | Cada correção de segurança fica revisável isoladamente |
-| MCP com versão fixa | Atualizar é trocar a versão no `.mcp.json` depois de ler o changelog do pacote |
+| Findings only in `.security-agent/`, with the `.gitignore` created first | Findings carry attack scripts, reproduction steps and sometimes secrets |
+| In chat, only title, count and one impact line | Exploit detail stays in the file, out of the conversation history |
+| A job starts only on request or confirmation | Every scan and pentest is billed to the AWS account |
+| `HIGH` and `MEDIUM` confidence by default | Lower bands are noisier, and widening is on request |
+| Triage sorted by risk level, risk score and confidence | Deterministic order, no eyeballing |
+| One fix plan per finding or per root cause | Each security fix stays reviewable on its own |
+| Pinned MCP version | Upgrading means bumping the version in `.mcp.json` after reading the package changelog |
+
+<br>
+
+---
+
+## Visual identity
+
+<div align="center">
+
+<img src="assets/palette.svg" alt="Palette, Security Agent #DD344C, Badge Red #C42D44, Squid Ink #232F3E, Claude Clay #D97757, Badge Clay #B5583A, Paper #F2F4F7" width="880">
+
+</div>
+
+The logo pairs the official AWS Architecture Icon for AWS Security Agent, in the lead, with
+the Claude mark in the corner, so neither identity is lost. The palette comes straight from
+both marks, the Security Agent red and the Claude clay, over AWS Squid Ink. The badges
+reuse the same colors, red for plugin data and clay for platform.
 
 <br>
 
@@ -357,22 +431,25 @@ Para desligar a sugestão automática de diff scan num projeto, apague
 
 ## Roadmap
 
-- [x] MCP, skills e hook traduzidos do power `f4c1d88`
-- [x] MCP `0.2.1` validado por handshake, com as 11 ferramentas listadas
-- [x] Hook validado em Linux nos 6 cenários (sem marcador, código novo, diff repetido, stop hook ativo, código alterado, só documentação)
-- [ ] Validar instalação e hook em macOS
-- [ ] Validar instalação e hook em Windows com Git Bash
-- [ ] Acompanhar novas versões do `awslabs.security-agent-mcp-server` e do power original
+- [x] MCP, skills and hook rewritten from power `f4c1d88`
+- [x] English and Brazilian Portuguese plugins in the same marketplace
+- [x] CI validating manifests, hook behavior in both plugins and the 11 MCP tools of `0.2.1`
+- [ ] Validate install and hook on macOS
+- [ ] Validate install and hook on Windows with Git Bash
+- [ ] Track new releases of `awslabs.security-agent-mcp-server` and of the original power
 
 <br>
 
 ---
 
-## Licença
+## Contributing
 
-Distribuído sob a [Apache License 2.0](plugins/aws-security-agent/LICENSE). O
-[`NOTICE`](plugins/aws-security-agent/NOTICE) registra a origem no power da AWS e as
-modificações feitas.
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md). In short, branch from `main`, keep both plugins
+in sync (the hook script is identical in both, and CI checks it) and run
+`bash tests/hook-test.sh` before opening a PR.
+
+For security issues, follow [`SECURITY.md`](SECURITY.md) and report privately rather than
+opening a public issue.
 
 <br>
 
@@ -380,10 +457,13 @@ modificações feitas.
 
 <div align="center">
 
-<img src="assets/logo.svg" alt="" width="56">
+<img src="assets/logo.svg" alt="" width="64">
 
-**AWS Security Agent para Claude Code** · adaptado pela [DreamSquad](https://dreamsquad.com.br)
+**AWS Security Agent for Claude Code** · adapted by [DreamSquad](https://dreamsquad.com.br)
 
-AWS e AWS Security Agent são marcas da Amazon.com, Inc. Este projeto não é oficial da AWS.
+Distributed under the [Apache License 2.0](LICENSE).
+
+<sub>AWS, AWS Security Agent and the AWS Architecture Icons are trademarks of Amazon.com, Inc. or its affiliates.
+Claude and Claude Code are trademarks of Anthropic, PBC. This project is not affiliated with or endorsed by either company.</sub>
 
 </div>

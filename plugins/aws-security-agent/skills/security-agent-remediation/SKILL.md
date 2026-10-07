@@ -1,63 +1,63 @@
 ---
 name: security-agent-remediation
-description: Traz os findings do AWS Security Agent (pentest e code review) para .security-agent/ fora do git, monta a triagem priorizada e conduz a correção. Use quando pedirem para corrigir, triar ou priorizar findings, resultados de pentest ou code review do Security Agent, ou vulnerabilidades reportadas na conta AWS, mesmo sem nomear o serviço.
+description: Pulls AWS Security Agent findings (pentest and code review) into a gitignored .security-agent/, builds a prioritized triage and drives remediation. Use when asked to fix, triage or prioritize findings, Security Agent pentest or code review results, or vulnerabilities reported in the AWS account, even without naming the service.
 ---
 
-# Remediação de findings do AWS Security Agent
+# AWS Security Agent findings remediation
 
-Leva de "tenho findings em algum lugar da AWS" a "estou corrigindo os mais importantes", em quatro etapas e nesta ordem: descobrir, exportar, triar, remediar.
+Takes you from "I have findings somewhere in AWS" to "I'm fixing the most important ones", in four stages and in this order: discover, export, triage, remediate.
 
-Finding traz script de ataque funcional, passos de reprodução, caminhos de arquivo e às vezes segredo vazado. Por isso o detalhe vive só em `.security-agent/`, que recebe um `.gitignore` com `*` antes de qualquer escrita, e no chat aparecem apenas título, contagem e uma linha de impacto. Confira também se o `.gitignore` da raiz do repositório cobre `.security-agent/`.
+Findings carry working attack scripts, reproduction steps, file paths and sometimes leaked secrets. So the detail lives only in `.security-agent/`, which gets a `.gitignore` containing `*` before anything is written, and the chat shows only titles, counts and one impact line. Also check that the repository root `.gitignore` covers `.security-agent/`.
 
-Prefira `call_api` do MCP `security-agent`, porque a chamada fica visível e auditada. Operação em PascalCase e `params` em camelCase (`agentSpaceId`, `pentestJobId`, `findingIds`). Use `get_api_guide` para descobrir nomes de operação. O AWS CLI (`aws securityagent ...`) é o plano B quando o MCP não estiver disponível.
+Prefer `call_api` from the `security-agent` MCP, so calls are visible and audited. Operation in PascalCase and `params` in camelCase (`agentSpaceId`, `pentestJobId`, `findingIds`). Use `get_api_guide` to discover operation names. The AWS CLI (`aws securityagent ...`) is the fallback when the MCP is unavailable.
 
-## 1. Descobrir, só leitura
+## 1. Discover, read-only
 
-A hierarquia é Application (conta e região), Agent Space, e dentro dele Penetration test, Pentest job e Findings, ou Code review, Code review job e Findings. Desça por ela com `ListAgentSpaces`, `ListPentests`, `ListCodeReviews`, `ListPentestJobsForPentest` e `ListCodeReviewJobsForCodeReview`.
+The hierarchy is Application (account and Region), Agent Space, and inside it either Penetration test, Pentest job and Findings, or Code review, Code review job and Findings. Walk down it with `ListAgentSpaces`, `ListPentests`, `ListCodeReviews`, `ListPentestJobsForPentest` and `ListCodeReviewJobsForCodeReview`.
 
-Status de job é `IN_PROGRESS`, `STOPPING`, `STOPPED`, `FAILED` ou `COMPLETED`. Somente `COMPLETED` tem o conjunto de findings estável e completo.
+Job status is `IN_PROGRESS`, `STOPPING`, `STOPPED`, `FAILED` or `COMPLETED`. Only `COMPLETED` has a stable, full set of findings.
 
-Agent spaces e scans levam o nome da aplicação alvo. Antes de mostrar a lista crua, deduza qual corresponde ao repositório aberto a partir do nome do diretório, do `git remote -v`, do `name` em `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml` ou `*.csproj`, e do título do README. Compare sem diferenciar maiúsculas e aceitando correspondência parcial. Apresente o palpite com o sinal que o sustenta e as alternativas, por exemplo "Este repo parece ser o **X** (pelo `git remote`), que bate com o agent space **Y**. Uso esse ou outro?". Sem correspondência confiável, mostre a lista completa. Exporte somente depois da confirmação do usuário e passe os ids confirmados explicitamente.
+Agent spaces and scans are named after the target application. Before showing the raw list, infer which one matches the open repository from the directory name, `git remote -v`, the `name` in `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml` or `*.csproj`, and the README title. Compare case-insensitively, allowing partial matches. Present the guess with the signal behind it and the alternatives, for example "This repo looks like **X** (from `git remote`), which matches the **Y** agent space. Use that, or another?". With no confident match, show the full list. Export only after the user confirms, and pass the confirmed ids explicitly.
 
-## 2. Exportar para `.security-agent/`
+## 2. Export to `.security-agent/`
 
-1. Crie `.security-agent/.gitignore` com `*`.
-2. Liste os jobs do scan confirmado, paginando com `nextToken` até ele sumir. Filtre `status == "COMPLETED"` e escolha o de maior `createdAt`. Sem job concluído, pare e diga ao usuário que não há job concluído e que vale aguardar ou conferir o status.
-3. `ListFindings` com `agentSpaceId` e `pentestJobId` ou `codeReviewJobId`, paginando até o fim. A confiança vai de `FALSE_POSITIVE`, `UNCONFIRMED`, `LOW`, `MEDIUM` a `HIGH`. Mantenha `HIGH` e `MEDIUM`, e amplie só a pedido do usuário.
-4. `BatchGetFindings` aceita até 25 ids por chamada. Divida em lotes de 25, concatene os arrays `findings` e marque cada um com `"source": "pentest"` ou `"source": "code-review"`.
-5. Para cada job, grave `.security-agent/findings_<jobId>.md` com a resposta completa do `BatchGetFindings`, todos os campos.
+1. Create `.security-agent/.gitignore` containing `*`.
+2. List the jobs of the confirmed scan, paginating with `nextToken` until it is absent. Filter `status == "COMPLETED"` and pick the greatest `createdAt`. With no completed job, stop and tell the user there is no completed job yet and that it is worth waiting or checking the job status.
+3. `ListFindings` with `agentSpaceId` and `pentestJobId` or `codeReviewJobId`, paginating to the end. Confidence goes `FALSE_POSITIVE`, `UNCONFIRMED`, `LOW`, `MEDIUM`, `HIGH`. Keep `HIGH` and `MEDIUM`, and widen only when the user asks.
+4. `BatchGetFindings` accepts up to 25 ids per call. Chunk in groups of 25, concatenate the `findings` arrays and tag each with `"source": "pentest"` or `"source": "code-review"`.
+5. For each job, write `.security-agent/findings_<jobId>.md` with the full `BatchGetFindings` response, every field.
 
-Sem agent space, scan ou job concluído, reporte ao usuário em vez de repetir chamadas, porque geralmente o scan não terminou ou a credencial aponta para outra conta. Em erro de credencial, confira com `aws sts get-caller-identity` e a região (padrão `us-east-1`, o serviço é regional).
+With no agent space, scan or completed job, report it to the user rather than retrying, since it usually means the scan has not finished or the credentials point at another account. On a credentials error, check `aws sts get-caller-identity` and the Region (default `us-east-1`, the service is regional).
 
-## 3. Triar
+## 3. Triage
 
-Leia os `findings_*.md` e ordene de forma determinística pela chave composta, do mais urgente ao menos urgente.
+Read the `findings_*.md` files and sort deterministically by the composite key, most urgent first.
 
-1. **Risk level**, `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFORMATIONAL`, e por último `UNKNOWN` ou ausente.
-2. **Risk score**, maior primeiro. `riskScore` é string numérica em pentest (`"10.0"`) e costuma faltar em code review. Converta para float e trate ausente como o menor valor possível.
+1. **Risk level**, `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFORMATIONAL`, then `UNKNOWN` or missing.
+2. **Risk score**, highest first. `riskScore` is a numeric string on pentest findings (`"10.0"`) and is often absent on code review findings. Coerce to float and treat missing as the lowest possible value.
 3. **Confidence**, `HIGH`, `MEDIUM`, `LOW`, `UNCONFIRMED`, `FALSE_POSITIVE`.
 
-Para o local de cada finding, use `filePath` quando existir. Senão, use `codeLocations[0].filePath` sem o prefixo de sandbox do scanner (ou só o nome do arquivo, se o prefixo não aparecer) e acrescente `:<lineStart>`. Pentest muitas vezes não tem arquivo, e aí a linha de impacto descreve o endpoint ou a cadeia de ataque.
+For each finding's location, use `filePath` when set. Otherwise use `codeLocations[0].filePath` with the scanner's sandbox prefix stripped (or just the basename when the prefix is absent) and append `:<lineStart>`. Pentest findings often have no file, and the impact line then describes the endpoint or attack chain.
 
-Resumo para o usuário.
+Summary for the user.
 
 ```
-## Triagem Security Agent, <agent space>
+## Security Agent triage, <agent space>
 
-<N> findings (<P> pentest, <C> code review) · confiança <níveis> · severidade <2 CRITICAL · 5 HIGH · 3 MEDIUM>
+<N> findings (<P> pentest, <C> code review) · confidence <levels> · severity <2 CRITICAL · 5 HIGH · 3 MEDIUM>
 
-### Prioridade
-1. [CRITICAL · score 10.0 · confiança HIGH] <nome>
-   - Tipo <riskType> · Origem <pentest|code-review>
-   - Onde <arquivo:linha ou endpoint>
-   - Impacto <uma linha em linguagem simples>
+### Priority
+1. [CRITICAL · score 10.0 · HIGH confidence] <name>
+   - Type <riskType> · Source <pentest|code-review>
+   - Where <file:line or endpoint>
+   - Impact <one plain-language line>
 
-### Ordem recomendada
-<o que corrigir primeiro e por quê>
+### Recommended order
+<what to fix first and why>
 ```
 
-Com mais de uns 10 findings, ou quando o usuário pedir só os N primeiros, detalhe os N e resuma o resto como contagem por severidade. `description`, `reasoning` e `attackScript` ficam nos arquivos. Destaque o `suggestedFix` dos findings de code review, que vira mudança direta no repo, e relacione os de pentest ao código responsável quando possível. Pentest e code review apontando a mesma causa raiz é o sinal mais forte de prioridade.
+With more than about 10 findings, or when the user asks for the top N, detail the top N and summarize the rest as counts by severity. `description`, `reasoning` and `attackScript` stay in the files. Call out the `suggestedFix` of code review findings, which maps directly to repo changes, and map pentest findings to the responsible code where possible. A pentest and a code review finding pointing to the same root cause is the strongest priority signal.
 
-## 4. Remediar
+## 4. Remediate
 
-Correção de segurança muda comportamento (autenticação, validação, parsing), então começa por um plano, com a edição de código vindo depois da aprovação. Pergunte se pode começar pelo primeiro da lista, citando o nome. Com o sim, entre em plan mode e monte o plano de correção a partir do título, local, impacto e `suggestedFix` do finding, referenciando o `findingId` e deixando os passos de exploração no arquivo. Para vários findings, um plano por finding ou por grupo de findings com a mesma causa, seguindo a ordem da triagem.
+Security fixes change behavior (auth, validation, parsing), so they start from a plan, with code edits after approval. Ask whether to start with the first item on the list, naming it. On yes, enter plan mode and build the fix plan from the finding's title, location, impact and `suggestedFix`, referencing the `findingId` and leaving exploit steps in the file. For several findings, one plan per finding or per group of findings sharing a root cause, following the triage order.

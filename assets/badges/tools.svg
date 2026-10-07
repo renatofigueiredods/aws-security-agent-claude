@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="129" height="20" role="img" aria-label="ferramentas MCP: 11">
-  <title>ferramentas MCP: 11</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="20" role="img" aria-label="MCP tools: 11">
+  <title>MCP tools: 11</title>
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <clipPath id="r"><rect width="129" height="20" rx="3" fill="#fff"/></clipPath>
+  <clipPath id="r"><rect width="88" height="20" rx="3" fill="#fff"/></clipPath>
   <g clip-path="url(#r)">
-    <rect width="105" height="20" fill="#232F3E"/>
-    <rect x="105" width="24" height="20" fill="#B8461B"/>
-    <rect width="129" height="20" fill="url(#s)"/>
+    <rect width="64" height="20" fill="#232F3E"/>
+    <rect x="64" width="24" height="20" fill="#C42D44"/>
+    <rect width="88" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="110" text-rendering="geometricPrecision" transform="scale(.1)">
-    <text x="525" y="150" fill="#010101" fill-opacity=".3">ferramentas MCP</text>
-    <text x="525" y="140">ferramentas MCP</text>
-    <text x="1170.0" y="150" fill="#010101" fill-opacity=".3">11</text>
-    <text x="1170.0" y="140">11</text>
+    <text x="320" y="150" fill="#010101" fill-opacity=".3">MCP tools</text>
+    <text x="320" y="140">MCP tools</text>
+    <text x="760.0" y="150" fill="#010101" fill-opacity=".3">11</text>
+    <text x="760.0" y="140">11</text>
   </g>
 </svg>

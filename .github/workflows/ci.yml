@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JSON manifests
+        run: find . -name '*.json' -not -path './.git/*' -print0 | xargs -0 -n1 jq -e . >/dev/null
+
+      - name: Hook syntax
+        run: for f in plugins/*/hooks/*.sh tests/*.sh; do bash -n "$f"; done
+
+      - name: Hook behavior
+        run: bash tests/hook-test.sh
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: MCP server exposes the 11 tools
+        run: |
+          version=$(jq -r '."security-agent".args[0]' plugins/aws-security-agent/.mcp.json)
+          tools=$( { printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"0"}}}' \
+            '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'; sleep 15; } |
+            timeout 120 uvx "$version" 2>/dev/null | jq -r 'select(.id==2) | .result.tools[].name' | sort | tr '\n' ' ')
+          echo "$tools"
+          expected="call_api get_api_guide get_scan_findings get_scan_status list_scans setup setup_check start_diff_scan start_security_scan start_threat_model_review stop_scan "
+          [ "$tools" = "$expected" ]

@@ -1,124 +1,124 @@
 ---
 name: aws-security-agent
-description: Opera o AWS Security Agent pelo MCP security-agent. Use para scan de segurança do código (completo ou só do diff antes de commit, PR ou deploy), threat model review de requirements.md ou design.md, pentest de aplicação publicada, e status ou resultado de scan. Use também para sugerir um scan quando uma mudança em autenticação, endpoint ou entrada externa terminar, ou antes de gerar tarefas a partir de um design. Para triar e corrigir findings já reportados, use security-agent-remediation.
+description: Runs AWS Security Agent through the security-agent MCP. Use for security scans of the code (full, or diff-only before a commit, PR or deploy), threat model reviews of requirements.md or design.md, pentests of a deployed application, and scan status or results. Also use to suggest a scan when a change to auth, endpoints or external input is finished, or before generating tasks from a design. To triage and fix findings already reported, use security-agent-remediation.
 ---
 
 # AWS Security Agent
 
-O MCP `security-agent` (pacote `awslabs.security-agent-mcp-server`) conversa com o AWS Security Agent na conta e região das credenciais AWS do processo. Cada scan e cada pentest gera cobrança na conta, então toda execução parte de um pedido ou de uma confirmação do usuário.
+The `security-agent` MCP (package `awslabs.security-agent-mcp-server`) talks to AWS Security Agent in the account and Region of the process's AWS credentials. Every scan and every pentest is billed to that account, so each run starts from a user request or a user confirmation.
 
-| Ferramenta | Função |
+| Tool | Purpose |
 |---|---|
-| `setup_check` | Verifica credenciais, agent space e service role |
-| `setup` | Cria ou reaproveita agent space e role IAM |
-| `start_security_scan` | Compacta o código, envia e inicia o scan completo. Devolve `scan_id` na hora |
-| `start_diff_scan` | Envia o repositório e o `git diff`, scan focado nas mudanças |
-| `start_threat_model_review` | Envia documentos de spec e o código, inicia threat model (STRIDE) |
-| `get_scan_status` | Etapa e tempo decorrido do job |
-| `get_scan_findings` | Findings, inclusive parciais durante a execução |
-| `list_scans` | Scans recentes |
-| `stop_scan` | Cancela um scan |
-| `call_api` | Chama qualquer operação da API (operação em PascalCase, `params` em camelCase) |
-| `get_api_guide` | Lista as operações da API |
+| `setup_check` | Verify credentials, agent space and service role |
+| `setup` | Create or reuse the agent space and IAM role |
+| `start_security_scan` | Zip, upload and start a full scan. Returns `scan_id` immediately |
+| `start_diff_scan` | Upload the repo plus `git diff`, scan focused on the changes |
+| `start_threat_model_review` | Upload spec docs plus source, start a threat model (STRIDE) |
+| `get_scan_status` | Job step and elapsed time |
+| `get_scan_findings` | Findings, partial results included while the job runs |
+| `list_scans` | Recent scans |
+| `stop_scan` | Cancel a scan |
+| `call_api` | Call any API operation (PascalCase operation, camelCase `params`) |
+| `get_api_guide` | List the API operations |
 
-## Roteamento
+## Routing
 
-| Intenção | Ação |
+| Intent | Action |
 |---|---|
-| Pedido direto de scan | Scan completo |
-| Checkpoint (pronto para commit, PR, produção) ou mudança sensível concluída | Sugerir diff scan e aguardar |
-| Escrevendo `requirements.md` ou `design.md`, ou prestes a gerar tarefas a partir deles | Sugerir threat model review antes e aguardar |
-| Testar aplicação publicada | Pentest |
-| Andamento | `get_scan_status` |
-| Resultado | `get_scan_findings` e Apresentação dos findings |
-| Domínios alvo, integrações, outra operação | `get_api_guide` e depois `call_api` |
-| Corrigir ou triar findings existentes | Skill `security-agent-remediation` |
+| Direct scan request | Full scan |
+| Checkpoint (ready to commit, PR, prod) or a finished security-sensitive change | Suggest a diff scan and wait |
+| Writing `requirements.md` or `design.md`, or about to generate tasks from them | Suggest a threat model review first and wait |
+| Test a deployed application | Pentest |
+| Progress | `get_scan_status` |
+| Results | `get_scan_findings` and Findings presentation |
+| Target domains, integrations, any other operation | `get_api_guide`, then `call_api` |
+| Fix or triage existing findings | Skill `security-agent-remediation` |
 
-Sugestão proativa cabe em uma linha e acontece uma vez por sessão. Recusada, o assunto se encerra na sessão. Sem setup feito, a sugestão é o setup.
+A proactive suggestion fits in one line and happens at most once per session. Once declined, the topic is closed for the session. Without setup, the suggestion is setup.
 
 ## Setup
 
-1. Chame `setup_check`.
-2. Sem setup e com `existing_agent_spaces` na resposta, mostre nome e id de cada um e pergunte qual usar ou se cria um novo. A escolha do usuário decide, sem seleção automática. Space existente vira `setup(agent_space_id="as-...")`. Space novo pede a pergunta sobre service role IAM existente e depois `setup(name="...")` ou `setup(name="...", service_role_arn="arn:...")`.
-3. Em repositório git, ative o hook de diff scan, que vem ligado por padrão. Se `.security-agent/diff-hook` não existir, crie `.security-agent/.gitignore` com `*` e o arquivo vazio `.security-agent/diff-hook`, e avise em uma linha: "Ativei a sugestão de diff scan ao fim dos turnos com mudança de código. Para desligar, apague `.security-agent/diff-hook`." Se o usuário pedir para não ativar, pule este passo.
-4. Confirme que o setup terminou.
+1. Call `setup_check`.
+2. Not set up and `existing_agent_spaces` returned, show each name and id and ask which one to use or whether to create a new one. The user's choice decides, with no auto-selection. An existing space becomes `setup(agent_space_id="as-...")`. A new space needs the question about an existing IAM service role, then `setup(name="...")` or `setup(name="...", service_role_arn="arn:...")`.
+3. In a git repository, enable the diff scan hook, which is on by default. If `.security-agent/diff-hook` does not exist, create `.security-agent/.gitignore` containing `*` and the empty file `.security-agent/diff-hook`, and say in one line: "Enabled the diff scan suggestion at the end of turns with code changes. To turn it off, delete `.security-agent/diff-hook`." If the user asks to skip it, skip this step.
+4. Confirm setup is complete.
 
-O servidor aceita apenas caminhos dentro de `WORKSPACE_ROOT` e, sem ela, dentro do diretório onde o Claude Code foi aberto. Quando o usuário quiser escanear outro diretório, ele exporta `SECURITY_AGENT_WORKSPACE_ROOT=/caminho` e reabre o Claude Code.
+The server only accepts paths inside `WORKSPACE_ROOT` and, when unset, inside the directory where Claude Code was opened. To scan another directory, the user exports `SECURITY_AGENT_WORKSPACE_ROOT=/path` and reopens Claude Code.
 
-## Acompanhar um job
+## Following a job
 
-Todo `start_*` devolve um `scan_id` imediatamente e o job segue na AWS. Ao iniciar, informe o id e o intervalo de checagem, e diga que o usuário pode pedir para parar de acompanhar. No mesmo turno, siga até um estado terminal (`COMPLETED`, `FAILED`, `STOPPED`) ou até o usuário pedir para parar. Entre as consultas rode `sleep <intervalo>` no Bash com `run_in_background: true` e consulte o status quando ele terminar. A primeira consulta acontece depois do primeiro intervalo. Fale com o usuário somente quando o status mudar.
+Every `start_*` returns a `scan_id` immediately and the job keeps running in AWS. When it starts, share the id and the polling interval, and mention the user can ask to stop polling. In the same turn, follow it to a terminal state (`COMPLETED`, `FAILED`, `STOPPED`) or until the user asks to stop. Between checks run `sleep <interval>` in Bash with `run_in_background: true` and check the status when it finishes. The first check happens after the first interval. Speak to the user only when the status changes.
 
-| Job | Intervalo |
+| Job | Interval |
 |---|---|
-| Scan completo e threat model | 300 s |
+| Full scan and threat model | 300 s |
 | Diff scan | 120 s |
 | Pentest | 900 s |
 
-## Scan completo
+## Full scan
 
-Revisão periódica do código inteiro, mais lenta e mais ampla.
+Periodic review of the whole codebase, slower and broader.
 
 1. `setup_check`.
-2. `start_security_scan(path="<caminho absoluto do workspace>", title="<repo>-<branch>")`. Caminho absoluto, título sem espaço e único por scan.
-3. Acompanhe com intervalo de 300 s.
-4. Em `COMPLETED`, `get_scan_findings` e Apresentação dos findings.
+2. `start_security_scan(path="<absolute workspace path>", title="<repo>-<branch>")`. Absolute path, title without spaces and unique per scan.
+3. Follow with a 300 s interval.
+4. On `COMPLETED`, `get_scan_findings` and Findings presentation.
 
 ## Diff scan
 
-Só o que mudou desde uma ref do git. Independe de scan completo anterior.
+Only what changed since a git ref. Needs no prior full scan.
 
 1. `setup_check`.
-2. Pergunte o que escanear, com `HEAD` (mudanças não commitadas) como padrão, `main` para a branch inteira, ou uma ref informada pelo usuário.
-3. `start_diff_scan(path="<caminho absoluto do workspace>", base_ref="<ref>")`.
-4. Acompanhe com intervalo de 120 s.
-5. Em `COMPLETED`, `get_scan_findings` e Apresentação dos findings focada no código alterado.
+2. Ask what to scan, with `HEAD` (uncommitted changes) as the default, `main` for the whole branch, or a ref the user provides.
+3. `start_diff_scan(path="<absolute workspace path>", base_ref="<ref>")`.
+4. Follow with a 120 s interval.
+5. On `COMPLETED`, `get_scan_findings` and Findings presentation focused on the changed code.
 
 ## Threat model review
 
-Verifica se `requirements.md` e `design.md` (ou o documento de design ou plano em edição) alteram a postura de segurança da aplicação. Independe de scan anterior.
+Checks whether `requirements.md` and `design.md` (or the design or plan document being edited) change the application's security posture. Needs no prior scan.
 
 1. `setup_check`.
-2. Reúna os caminhos absolutos dos documentos, pelo menos um.
-3. `start_threat_model_review(path="<caminho absoluto do workspace>", specs=["<abs>/requirements.md", "<abs>/design.md"])`.
-4. Acompanhe com intervalo de 300 s.
-5. Em `COMPLETED`, `get_scan_findings`. Cada ameaça traz `statement`, `severity`, `stride`, `threatImpact`, `recommendation` e `impactedAssets`. Agrupe por severidade e destaque como quebra de postura toda ameaça que represente regressão em relação ao design anterior. Siga a Apresentação dos findings.
+2. Collect the absolute paths of the documents, at least one.
+3. `start_threat_model_review(path="<absolute workspace path>", specs=["<abs>/requirements.md", "<abs>/design.md"])`.
+4. Follow with a 300 s interval.
+5. On `COMPLETED`, `get_scan_findings`. Each threat has `statement`, `severity`, `stride`, `threatImpact`, `recommendation` and `impactedAssets`. Group by severity and call out every threat that is a regression from the previous design as a security posture break. Then follow Findings presentation.
 
 ## Pentest
 
-Roda por horas, conforme o escopo.
+Runs for hours, depending on scope.
 
-1. `setup_check`, e `setup` se for a primeira vez.
+1. `setup_check`, and `setup` the first time.
 2. `call_api("CreateTargetDomain", {agentSpaceId, targetDomainName, verificationMethod: "HTTP_ROUTE"})`.
 3. `call_api("VerifyTargetDomain", {agentSpaceId, targetDomainId})`.
 4. `call_api("CreatePentest", {agentSpaceId, title, assets: {endpoints: [{uri: "..."}]}, serviceRole: "arn:..."})`.
 5. `call_api("StartPentestJob", {agentSpaceId, pentestId})`.
-6. Acompanhe com `call_api("BatchGetPentestJobs", {agentSpaceId, pentestJobIds: [...]})` e intervalo de 900 s.
-7. Em `COMPLETED`, `call_api("ListFindings", {agentSpaceId, pentestJobId})` e Apresentação dos findings.
+6. Follow with `call_api("BatchGetPentestJobs", {agentSpaceId, pentestJobIds: [...]})` and a 900 s interval.
+7. On `COMPLETED`, `call_api("ListFindings", {agentSpaceId, pentestJobId})` and Findings presentation.
 
-## Apresentação dos findings
+## Findings presentation
 
-Ao fim de qualquer scan, entregue as duas partes.
+At the end of any scan, deliver both parts.
 
-**Resumo no chat**, agrupado por severidade, com local de cada finding.
+**Chat summary**, grouped by severity, with each finding's location.
 
 ```
 🟣 CRITICAL: {name}
-   Arquivo: {filePath}:{lineStart}
+   File: {filePath}:{lineStart}
    {description}
 🔴 HIGH ...
 🟡 MEDIUM ...
 🟢 LOW ...
 ```
 
-**Relatório completo** em `.security-agent/findings-{scan_id}.md`, com `.security-agent/.gitignore` contendo `*` criado antes. O relatório traz todos os campos que a API devolveu para cada finding (`findingId`, `name`, `description`, `riskLevel`, `riskType`, `confidence`, `status`, `codeLocations` com `filePath`, `lineStart` e `lineEnd`, `remediationCode` e qualquer outro). Avise o caminho do arquivo ao usuário.
+**Full report** at `.security-agent/findings-{scan_id}.md`, with `.security-agent/.gitignore` containing `*` created first. The report carries every field the API returned for each finding (`findingId`, `name`, `description`, `riskLevel`, `riskType`, `confidence`, `status`, `codeLocations` with `filePath`, `lineStart` and `lineEnd`, `remediationCode`, and any other). Tell the user the file path.
 
 ```markdown
-# Relatório de scan {scan_id}
+# Scan report {scan_id}
 
-**Tipo** FULL | DIFF | THREAT_MODEL · **Título** {title} · **Início** {started_at} · **Total** {count}
+**Type** FULL | DIFF | THREAT_MODEL · **Title** {title} · **Started** {started_at} · **Total** {count}
 
-| Severidade | Quantidade |
+| Severity | Count |
 |---|---|
 | CRITICAL | N |
 | HIGH | N |
@@ -128,27 +128,27 @@ Ao fim de qualquer scan, entregue as duas partes.
 ### 🟣 CRITICAL, {name}
 - **ID** {findingId}
 - **Risk type** {riskType}
-- **Confiança** {confidence}
+- **Confidence** {confidence}
 - **Status** {status}
-- **Local** `{filePath}:{lineStart}-{lineEnd}`
+- **Location** `{filePath}:{lineStart}-{lineEnd}`
 
 {description}
 
 {remediationCode}
 ```
 
-Em seguida ofereça a correção em uma linha, perguntando se pode aplicar as correções de cima para baixo por severidade. Com o sim, percorra todos os findings de CRITICAL a LOW em sequência, aplicando `remediationCode` nas `codeLocations` e reportando uma linha por correção com nome e `arquivo:linha`. Terminadas as correções, rode `start_diff_scan(path, base_ref="HEAD")` para verificar e acompanhe. Se o usuário escolher findings específicos, corrija apenas esses. Se recusar, indique o arquivo do relatório e encerre o assunto na sessão.
+Then offer remediation in one line, asking whether to apply the fixes top-down by severity. On yes, go through every finding from CRITICAL to LOW in sequence, applying `remediationCode` at the `codeLocations` and reporting one line per fix with the name and `file:line`. When all fixes are applied, run `start_diff_scan(path, base_ref="HEAD")` to verify and follow it. If the user picks specific findings, fix only those. If the user declines, point to the report file and close the topic for the session.
 
-## Problemas comuns
+## Troubleshooting
 
-| Sintoma | Ação |
+| Symptom | Action |
 |---|---|
-| "Not configured. Run setup first." | `setup_check` e `setup` |
-| "S3 access validation failed" | Bucket não registrado no agent space. Repita o scan, que registra sozinho, ou rode `setup` |
-| "Agent space no longer exists" | `setup` para criar ou escolher outro |
-| Scan demorando | `get_scan_status` e verifique erro ou etapa |
-| Código grande demais | Escaneie um subdiretório |
-| Caminho fora da raiz permitida | `SECURITY_AGENT_WORKSPACE_ROOT` e reabrir o Claude Code |
-| Credencial ou serviço indisponível | `aws sts get-caller-identity` e confira a região (`AWS_REGION`, padrão `us-east-1`) |
+| "Not configured. Run setup first." | `setup_check`, then `setup` |
+| "S3 access validation failed" | Bucket not registered on the agent space. Rerun the scan, which registers it, or run `setup` |
+| "Agent space no longer exists" | `setup` to create or pick another |
+| Scan taking too long | `get_scan_status` and check for errors or the current step |
+| Code too large | Scan a subdirectory |
+| Path outside the allowed root | `SECURITY_AGENT_WORKSPACE_ROOT` and reopen Claude Code |
+| Credentials or service unavailable | `aws sts get-caller-identity` and check the Region (`AWS_REGION`, default `us-east-1`) |
 
-Regiões suportadas em https://docs.aws.amazon.com/securityagent/latest/userguide/resilience.html.
+Supported Regions at https://docs.aws.amazon.com/securityagent/latest/userguide/resilience.html.

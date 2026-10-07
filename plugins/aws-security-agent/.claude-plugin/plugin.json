@@ -1,7 +1,7 @@
 {
   "name": "aws-security-agent",
   "version": "0.1.0",
-  "description": "Scan de código, diff scan, threat model review, pentest e remediação de findings com o AWS Security Agent",
+  "description": "AWS Security Agent for Claude Code, code scan, diff scan, threat model review, pentest and findings remediation",
   "author": {
     "name": "DreamSquad"
   },
