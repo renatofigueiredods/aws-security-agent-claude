@@ -19,7 +19,7 @@
 O power do AWS Security Agent para Kiro, reescrito como plugin do Claude Code.
 Um MCP server, duas skills e um hook, com os findings fora do git desde o primeiro byte.
 
-<a href="plugins/aws-security-agent-pt-br/.claude-plugin/plugin.json"><img src="assets/badges/release.svg" alt="release: v0.1.0"></a>
+<a href="plugins/aws-security-agent-pt-br/.claude-plugin/plugin.json"><img src="assets/badges/release.svg" alt="release: v0.1.1"></a>
 <a href="LICENSE"><img src="assets/badges/license.svg" alt="license: Apache-2.0"></a>
 <a href="https://github.com/renatofigueiredods/aws-security-agent-claude/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/renatofigueiredods/aws-security-agent-claude/ci.yml?branch=main&label=build&labelColor=232F3E" alt="build"></a>
 <a href="https://github.com/renatofigueiredods/aws-security-agent-claude/stargazers"><img src="https://img.shields.io/github/stars/renatofigueiredods/aws-security-agent-claude?label=stars&labelColor=232F3E&color=C42D44" alt="stars"></a>
@@ -34,32 +34,7 @@ Um MCP server, duas skills e um hook, com os findings fora do git desde o primei
 
 <br>
 
-[**Instalação**](#instalação) · [**Como funciona**](#como-funciona) · [**Uso**](#uso) · [**Identidade**](#identidade-visual) · [**Contribuir**](CONTRIBUTING.md)
-
-<br>
-
-<details>
-<summary><b>&nbsp;Trocar para a opção 2 da identidade&nbsp;</b></summary>
-
-<br>
-
-<img src="assets/logo-lockup.svg" alt="AWS Security Agent + Claude Code, lado a lado" width="340">
-
-<br><br>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/pt-br/wordmark-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/pt-br/wordmark-light.svg">
-  <img src="assets/pt-br/wordmark-light.svg" alt="AWS SECURITY AGENT para Claude Code" width="420">
-</picture>
-
-<br><br>
-
-<img src="assets/palette.svg" alt="Paleta, Security Agent #DD344C, Badge Red #C42D44, Squid Ink #232F3E, Claude Clay #D97757, Badge Clay #B5583A, Paper #F2F4F7" width="880">
-
-</details>
-
-<sub>A opção 1 acima é a aplicada. A opção 2 coloca as duas marcas lado a lado.</sub>
+[**Instalação**](#instalação) · [**Como funciona**](#como-funciona) · [**Uso**](#uso) · [**Contribuir**](CONTRIBUTING.md)
 
 </div>
 
@@ -407,24 +382,6 @@ Para desligar a sugestão automática de diff scan num projeto, apague
 | Triagem ordenada por risk level, risk score e confiança | Ordenação determinística, sem leitura a olho |
 | Um plano de correção por finding ou por causa raiz | Cada correção de segurança fica revisável isoladamente |
 | MCP com versão fixa | Atualizar é trocar a versão no `.mcp.json` depois de ler o changelog do pacote |
-
-<br>
-
----
-
-## Identidade visual
-
-<div align="center">
-
-<img src="assets/palette.svg" alt="Paleta, Security Agent #DD344C, Badge Red #C42D44, Squid Ink #232F3E, Claude Clay #D97757, Badge Clay #B5583A, Paper #F2F4F7" width="880">
-
-</div>
-
-A logo junta o ícone oficial do AWS Architecture Icons para o AWS Security Agent, em
-destaque, com a marca do Claude no canto, sem perder a identidade de nenhum dos dois. A
-paleta sai direto das duas marcas, o vermelho do Security Agent e o terracota do Claude,
-sobre o Squid Ink da AWS. Os badges usam as mesmas cores, vermelho para dado do plugin e
-terracota para plataforma.
 
 <br>
 
