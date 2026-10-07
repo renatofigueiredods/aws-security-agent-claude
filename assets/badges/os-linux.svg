@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="62" height="20" role="img" aria-label="os: Linux">
+  <title>os: Linux</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="62" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="22" height="20" fill="#232F3E"/>
+    <rect x="22" width="40" height="20" fill="#2F6690"/>
+    <rect width="62" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="110" text-rendering="geometricPrecision" transform="scale(.1)">
+    <text x="110" y="150" fill="#010101" fill-opacity=".3">os</text>
+    <text x="110" y="140">os</text>
+    <text x="420.0" y="150" fill="#010101" fill-opacity=".3">Linux</text>
+    <text x="420.0" y="140">Linux</text>
+  </g>
+</svg>

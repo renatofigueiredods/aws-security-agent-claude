@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="153" height="20" role="img" aria-label="base: Kiro power f4c1d88">
+  <title>base: Kiro power f4c1d88</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="153" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="36" height="20" fill="#232F3E"/>
+    <rect x="36" width="117" height="20" fill="#B8461B"/>
+    <rect width="153" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="110" text-rendering="geometricPrecision" transform="scale(.1)">
+    <text x="180" y="150" fill="#010101" fill-opacity=".3">base</text>
+    <text x="180" y="140">base</text>
+    <text x="945.0" y="150" fill="#010101" fill-opacity=".3">Kiro power f4c1d88</text>
+    <text x="945.0" y="140">Kiro power f4c1d88</text>
+  </g>
+</svg>

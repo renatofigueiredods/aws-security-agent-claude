@@ -1,0 +1,10 @@
+{
+  "name": "aws-security-agent",
+  "version": "0.1.0",
+  "description": "Scan de código, diff scan, threat model review, pentest e remediação de findings com o AWS Security Agent",
+  "author": {
+    "name": "DreamSquad"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["security", "aws", "pentest", "sast", "threat-model"]
+}

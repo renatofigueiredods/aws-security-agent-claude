@@ -1,0 +1,9 @@
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Este plugin é uma adaptação para Claude Code do aws-security-agent-kiro-power
+(https://github.com/AWS-Security-Agent/aws-security-agent-kiro-power, commit f4c1d88),
+distribuído sob a Apache License 2.0.
+
+Modificações em relação ao original, POWER.md e steering/security-agent-remediation.md
+traduzidos para português e reescritos como skills, hook do Kiro reescrito como Stop hook
+do Claude Code, e versão do MCP server fixada em 0.2.1.

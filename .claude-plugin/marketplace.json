@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "aws-security-agent-claude",
+  "description": "AWS Security Agent para Claude Code",
+  "owner": {
+    "name": "DreamSquad"
+  },
+  "plugins": [
+    {
+      "name": "aws-security-agent",
+      "description": "Scan de código, diff scan, threat model review, pentest e remediação de findings com o AWS Security Agent",
+      "source": "./plugins/aws-security-agent",
+      "category": "security"
+    }
+  ]
+}

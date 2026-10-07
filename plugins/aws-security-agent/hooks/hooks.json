@@ -1,0 +1,16 @@
+{
+  "description": "Sugere diff scan do AWS Security Agent ao fim do turno quando há mudança de código nova no projeto",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/diff-scan-suggester.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

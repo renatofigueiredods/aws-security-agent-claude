@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="184" viewBox="0 0 160 184" role="img" aria-label="AWS Security Agent para Claude Code">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2E3D52"/>
+      <stop offset="1" stop-color="#161E2A"/>
+    </linearGradient>
+    <linearGradient id="scan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF9900" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#FF9900"/>
+      <stop offset="1" stop-color="#FF9900" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="inner"><path d="M80 18 L136 38 V88 C136 124 112 150 80 164 C48 150 24 124 24 88 V38 Z"/></clipPath>
+  </defs>
+  <path d="M80 6 L148 30 V88 C148 132 120 164 80 180 C40 164 12 132 12 88 V30 Z" fill="url(#body)" stroke="#FF9900" stroke-width="4" stroke-linejoin="round"/>
+  <g clip-path="url(#inner)" stroke="#3F5470" stroke-width="1">
+    <path d="M24 58 H136 M24 78 H136 M24 98 H136 M24 118 H136 M24 138 H136"/>
+    <path d="M52 18 V164 M80 18 V164 M108 18 V164"/>
+  </g>
+  <rect x="24" y="66" width="112" height="6" fill="url(#scan)" clip-path="url(#inner)"/>
+  <path d="M56 100 L74 118 L108 82" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
