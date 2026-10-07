@@ -1,6 +1,6 @@
 {
   "name": "aws-security-agent-pt-br",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AWS Security Agent em português, scan de código, diff scan, threat model review, pentest e remediação de findings",
   "author": {
     "name": "DreamSquad"

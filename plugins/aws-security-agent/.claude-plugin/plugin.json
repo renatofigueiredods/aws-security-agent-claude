@@ -1,10 +1,16 @@
 {
   "name": "aws-security-agent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AWS Security Agent for Claude Code, code scan, diff scan, threat model review, pentest and findings remediation",
   "author": {
     "name": "DreamSquad"
   },
   "license": "Apache-2.0",
-  "keywords": ["security", "aws", "pentest", "sast", "threat-model"]
+  "keywords": [
+    "security",
+    "aws",
+    "pentest",
+    "sast",
+    "threat-model"
+  ]
 }

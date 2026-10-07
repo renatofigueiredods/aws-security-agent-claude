@@ -1,7 +1,11 @@
 {
   "security-agent": {
     "command": "uvx",
-    "args": ["awslabs.security-agent-mcp-server@0.2.1"],
+    "args": [
+      "--with",
+      "botocore[crt]",
+      "awslabs.security-agent-mcp-server@0.2.1"
+    ],
     "env": {
       "WORKSPACE_ROOT": "${SECURITY_AGENT_WORKSPACE_ROOT:-}"
     }
